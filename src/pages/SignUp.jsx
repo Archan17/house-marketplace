@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import OAuth from "../components/OAuth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import { ReactComponent as ArrowRightIcon } from "../assets/svg/keyboardArrowRightIcon.svg";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
@@ -51,7 +52,6 @@ function SignUp() {
       formDataCopy.timestamp = serverTimestamp();
 
       await setDoc(doc(db, "users", user.uid), formDataCopy);
-
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong with registration");
@@ -112,7 +112,7 @@ function SignUp() {
           </div>
         </form>
 
-        {/* Google OAuth */}
+        <OAuth />
 
         <Link to="/sign-in" className="registerLink">
           Sign In Instead
