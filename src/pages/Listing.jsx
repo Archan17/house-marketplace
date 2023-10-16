@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { Navigation, Pagination, Scrollbar, A11y } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
 import { getDoc, doc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../firebase.config";
@@ -21,7 +27,7 @@ function Listing() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        console.log(docSnap.data());
+        // console.log(docSnap.data());
         setListing(docSnap.data());
         setLoading(false);
       }
@@ -30,31 +36,50 @@ function Listing() {
     fetchListing();
   }, [navigate, params.listingId]);
 
-  if (loading) {
-    return <Spinner />;
-  }
+  ///////////////////////////////////////
+  // Rendering the component
+  ///////////////////////////////////////
+  if (loading) return <Spinner />;
 
   return (
     <main>
-      {/* Slider */}
+      <Swiper
+        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        slidesPerView={1}
+        navigation
+        pagination={{ clickable: true }}
+        scrollbar={{ draggable: true }}
+        style={{ height: "300px" }}
+      >
+        {listing.imageUrls.map((url, index) => (
+          <SwiperSlide key={index}>
+            <div
+              style={{
+                background: `url(${listing.imageUrls[index]}) center no-repeat`,
+                backgroundSize: "cover",
+              }}
+              className="swiperSlideDiv"
+            ></div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       <div
         className="shareIconDiv"
         onClick={() => {
           navigator.clipboard.writeText(window.location.href);
           setShareLinkCopied(true);
-          setTimeout(() => {
-            setShareLinkCopied(false);
-          }, 2000);
+          setTimeout(() => setShareLinkCopied(false), 2000);
         }}
       >
-        <img src={shareIcon} alt="" />
+        <img src={shareIcon} alt="share" />
       </div>
 
       {shareLinkCopied && <p className="linkCopied">Link Copied!</p>}
+
       <div className="listingDetails">
         <p className="listingName">
-          {listing.name} - $
+          {listing.name} - €
           {listing.offer
             ? listing.discountedPrice
                 .toString()
@@ -63,13 +88,16 @@ function Listing() {
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </p>
-        <p className="listinglocation">{listing.location}</p>
+
+        <p className="listingLocation">{listing.location}</p>
+
         <p className="listingType">
           For {listing.type === "rent" ? "Rent" : "Sale"}
         </p>
+
         {listing.offer && (
           <p className="discountPrice">
-            ${listing.regularprice - listing.discountedPrice} discount
+            €{listing.regularPrice - listing.discountedPrice} discount
           </p>
         )}
 
@@ -89,11 +117,10 @@ function Listing() {
         </ul>
 
         <p className="listingLocationTitle">Location</p>
-        {/* Map */}
 
-        {auth.currentUser?.uid !== listing.useRef && (
+        {auth.currentUser?.uid !== listing.userRef && (
           <Link
-            to={`/contact/${listing.useRef}?listingName=${listing.name}`}
+            to={`/contact/${listing.userRef}?listingName=${listing.name}`}
             className="primaryButton"
           >
             Contact Landlord

@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { db } from "../firebase.config";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import OAuth from "../components/OAuth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase.config";
+import { Link, useNavigate } from "react-router-dom";
 import { ReactComponent as ArrowRightIcon } from "../assets/svg/keyboardArrowRightIcon.svg";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
+import { toast } from "react-toastify";
+import OAuth from "../components/OAuth";
 
 function SignUp() {
+  // State management
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -20,10 +21,13 @@ function SignUp() {
     password: "",
   });
 
+  // Deconstructing the data from form
   const { name, email, password } = formData;
 
+  // Initialize navigation
   const navigate = useNavigate();
 
+  // Function that update the form data based on the 'id' entered on inputs
   const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -31,6 +35,7 @@ function SignUp() {
     }));
   };
 
+  // Sign up new users
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,29 +47,34 @@ function SignUp() {
         email,
         password
       );
+
       const user = userCredential.user;
+
       updateProfile(auth.currentUser, {
         displayName: name,
       });
 
+      // Add user to Firestore
       const formDataCopy = { ...formData };
       delete formDataCopy.password;
       formDataCopy.timestamp = serverTimestamp();
-
       await setDoc(doc(db, "users", user.uid), formDataCopy);
+
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong with registration");
     }
   };
 
+  ///////////////////////////////////////
+  // Rendering the component
+  ///////////////////////////////////////
   return (
     <>
       <div className="pageContainer">
         <header>
-          <p className="pageHeader">Welcome Back</p>
+          <p className="pageHeader">Welcome!</p>
         </header>
-
         <form onSubmit={onSubmit}>
           <input
             type="text"
@@ -74,6 +84,7 @@ function SignUp() {
             value={name}
             onChange={onChange}
           />
+
           <input
             type="email"
             className="emailInput"
@@ -95,13 +106,14 @@ function SignUp() {
 
             <img
               src={visibilityIcon}
-              alt="password"
-              className="showPassword"
-              onClick={() => setShowPassword((prevstate) => !prevstate)}
+              alt="Show Password"
+              className="img showPassword"
+              onClick={() => setShowPassword((prevState) => !prevState)}
             />
           </div>
+
           <Link to="/forgot-password" className="forgotPasswordLink">
-            Forgot Password
+            Forgot Password?
           </Link>
 
           <div className="signUpBar">
@@ -121,5 +133,4 @@ function SignUp() {
     </>
   );
 }
-
 export default SignUp;

@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ReactComponent as OfferIcon } from "../assets/svg/localOfferIcon.svg";
 import { ReactComponent as ExploreIcon } from "../assets/svg/exploreIcon.svg";
 import { ReactComponent as PersonOutlineIcon } from "../assets/svg/personOutlineIcon.svg";
@@ -12,6 +12,7 @@ function Navbar() {
       return true;
     }
   };
+
   return (
     <footer className="navbar">
       <nav className="navbarNav">
@@ -32,6 +33,7 @@ function Navbar() {
               Explore
             </p>
           </li>
+
           <li className="navbarListItem" onClick={() => navigate("/offers")}>
             <OfferIcon
               fill={pathMatchRoute("/offers") ? "#2c2c2c" : "#8f8f8f"}
@@ -48,6 +50,7 @@ function Navbar() {
               Offers
             </p>
           </li>
+
           <li className="navbarListItem" onClick={() => navigate("/profile")}>
             <PersonOutlineIcon
               fill={pathMatchRoute("/profile") ? "#2c2c2c" : "#8f8f8f"}
@@ -69,5 +72,4 @@ function Navbar() {
     </footer>
   );
 }
-
 export default Navbar;
